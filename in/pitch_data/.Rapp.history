@@ -1,0 +1,4151 @@
+boxplot(intdif~tense, d2)
+bwplot(syldurdif~tense|verb, d2)
+library(lattice)
+bwplot(syldurdif~tense|verb, d2)
+bwplot(syldurdif~tense|verb, d2, layout=c(1,3))
+bwplot(syldurdif~tense|verb, d2, layout=c(3,1))
+bwplot(syldurdif~tense|spk, d2, layout=c(3,1))
+bwplot(syldurdif~tense|spk, d2)
+## Switchboard dataset#
+#
+d = read.delim('/Users/frator/Documents/Gaps/table.txt')#
+d2 = subset(d, dialR!='?' & dialL!='?')#
+d3 = subset(d2, corrections%in%c('no_errors','corrected'))#
+d4 = subset(d2, corrections=='no_errors')#
+#
+# answers to questions#
+#
+dq = d3[grep('_q', d3$dialL),]#
+dq$dialL = as.factor(as.character(dq$dialL))#
+densityplot(~dur|dialL, dq)#
+barplot(tapply(dq$dur, dq$dialL, mean))#
+boxplot(dur~dialL,dq)#
+#
+# agreements#
+#
+a = subset(d3, dialR%in%c('agree', 'reject', 'hold', 'maybe'))#
+a$dialR = as.factor(as.character(a$dialR))#
+densityplot(~dur|dialR, a, layout=c(1,4))#
+barplot(tapply(a$dur, a$dialR, mean))#
+boxplot(dur~dialR,a)#
+#
+#
+d5 = subset(dq, dialR%in%c('yes', 'neg', 'statement', 'affirm', 'no'))#
+densityplot(~dur|dialR, d5[d5$dialL=='yn_q',], layout=c(1,5))#
+#
+densityplot(~dur, d3, groups=sexR, xlim=c(-2,2))
+densityplot(~dur|dialL, dq)
+densityplot(~dur|dialR, dq)
+densityplot(~dur|dialR, d3)
+densityplot(~dur|dialR, d3, xlim=c(-2,2))
+densityplot(~dur|dialL, d3, xlim=c(-2,2))
+table(d3$dialR)
+densityplot(~dur|dialR, d3, xlim=c(-2,2))
+barplot(tapply(a$dur, a$dialR, mean))
+barplot(tapply(dq$dur, dq$dialL, mean))
+str(d3)
+barplot(tapply(a$dur, a$dialR, mean))
+densityplot(~dur|dialR, a, layout=c(1,4))
+d5 = subset(dq, dialR%in%c('yes', 'neg', 'statement', 'affirm', 'no', 'ans_dis'))
+densityplot(~dur|dialR, d5, layout=c(1,5))
+densityplot(~dur|dialR, d3, layout=c(1,5))
+densityplot(~dur|dialR, d3)
+d5 = subset(dq, dialR%in%c('yes', 'neg', 'statement', 'affirm', 'no', 'ans_dispref'))
+densityplot(~dur|dialR, d5)
+densityplot(~dur|dialR, d3)
+densityplot(~dur|dialR, d3, xlim=c(-2,2))
+#
+#
+# import the thre tables#
+#
+d1 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15a.txt',quote = "", na.string=c('?','NA'))#
+d2 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15b.txt',quote = "", na.string=c('?','NA'))#
+d3 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15c.txt',quote = "", na.string=c('?','NA'))#
+#
+d = rbind(d1,d2)#
+d = rbind(d,d3)#
+d.raw = d#
+#
+rm(d1)#
+rm(d2)#
+rm(d3)#
+#
+## exclude deferred responses (responses to increments, etc.)#
+d = subset(d, pos1!='pur.inc' & pos1!= 'insert')#
+#
+## exclude third party actions#
+d = subset(d, act1!='"offer, third party"' & act1!='"proposal, third party"' & act1!='"request, third party"' & act1!='"suggestion/offer, third party"' & act1!='"offer/proposal, third party"' & act1 != '"invitation, third party"' & act1 != '"pre, third party"')#
+#
+d$act1 = as.factor(as.character(d$act1))#
+#
+## creates a variable encoding the number of turn design features in response#
+d$score = 0#
+d[d$has_well2=='y',]$score = d[d$has_well2=='y',]$score + 1#
+d[d$has_rep2=='y',]$score = d[d$has_rep2=='y',]$score + 1#
+d[d$has_hes2=='y',]$score = d[d$has_hes2=='y',]$score + 1#
+d[d$has_pause2=='y',]$score = d[d$has_pause2=='y',]$score + 1#
+d[d$has_breath2=='y',]$score = d[d$has_breath2=='y',]$score + 1#
+d[d$has_click2=='y',]$score = d[d$has_click2=='y',]$score + 1#
+#
+d$score2 = NA#
+d[d$score==0,]$score2 = '0'#
+d[d$score==1,]$score2 = '1'#
+d[d$score==2,]$score2 = '2'#
+d[d$score>2,]$score2 = '3+'#
+#
+## some manual corrections#
+d[d$name=='1a Ali & Sara 1_35.041',]$act2 = 'accept'#
+d[d$name=='1a Ali & Sara 1_35.041',]$pref = 'pref'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$act2 = 'accept'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$pref = 'pref'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1 = 'redo'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1b = 'sub'#
+d[d$name=='3b Ali & Boo 3_80.190',]$act2 = 'accept_qual'#
+#
+#
+#
+## these ones had pref = 'dis?' originally#
+d[d$pref=='dis?',]$pref = 'dis'#
+#
+# but this one has 'yes' in second, so we make it pref:#
+d[d$name=='Holt.SO.88.2.8_38.282',]$pref = 'pref'#
+#
+## New preference variables#
+#
+# pref2#
+# pref = unqualified pref#
+# ppref = pseudo preferred#
+d$pref2 = NA#
+d[d$act2b%in%c('accept_unqual','go ahead'),]$pref2 = 'pref'#
+d[d$act2b%in%c('accept_qual'),]$pref2 = 'ppref'#
+d[d$act2b%in%c('reject','reject_flat','pre-reject', 'block', 'equivocate'),]$pref2 = 'dis'#
+d[d$act2b%in%c('repair','insert', 'receipt'),]$pref2 = 'pdis'#
+d[is.na(d$pref2),]$pref2 = 'pdis'#
+#
+#pref3. Only two levels (pref and dis)#
+d$pref3 = 'pref'#
+d[d$pref2%in%c('dis','pdis'),]$pref3 = 'dis'#
+#
+#pref4. Collapses pdis and dis into dis. 3 levels: pref, ppref, dis. #
+d$pref4 = 'dis'#
+d[d$pref2=='pref',]$pref4 = 'pref'#
+d[d$pref2=='ppref',]$pref4 = 'ppref'#
+#
+## remove 6 outliers (see reasons in the earlier R file)#
+d = subset(d, offset_u > -0.5 & offset_u < 2)#
+#
+# d.no_overlap#
+d.no_overlap = subset(d, is.na(offset)==F)#
+#
+# d gapmean outlier out#
+d.gapmean = subset(d, gapmean<4000)#
+#
+d$tipb = (d$i_present==T | d$u_present==T | d$w_present==T)#
+#
+# only dispreferreds with no TIP or breath#
+f = subset(d, pref4=='dis' & i_present==F & u_present==F & w_present==F)#
+#
+dj = subset(d, is.na(jgap)==F)#
+#
+dj$jgap_timing = NA#
+dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap_timing = as.numeric(as.character(dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap))#
+#
+dj$jgap_cat = as.character(dj$jgap)#
+#
+dj[dj$jgap=='200' | dj$jgap=='300' | dj$jgap=='400' | dj$jgap=='500' |dj$jgap=='600' |dj$jgap=='700' | dj$jgap=='800' | dj$jgap=='1000' | dj$jgap=='1200' | dj$jgap=='1300' | dj$jgap=='1500',]$jgap_cat = 'gap'#
+dj$jgap_cat = as.factor(dj$jgap_cat)#
+#
+dj$jgap_timing2 = dj$jgap_timing#
+dj[dj$jgap_cat%in%c('nogap','latch'),]$jgap_timing2 = 0#
+dj[dj$jgap_cat=='micro',]$jgap_timing2 = 100#
+#
+#
+# remove outliers#
+dj2 = subset(dj, offset_i > 0.25 & offset_i< 1.3)#
+plot(dj2$offset_i , dj2$jgap_timing2/1000, ylim=c(-0.5,2), xlim=c(-0.5, 2), xlab='TIS (s)', ylab='GJ timing')#
+abline(0,1, lty=2)#
+abline(lm(jgap_timing2/1000~offset_i, dj2), lty=1, add=T)#
+#
+#
+#
+densityplot(~jgap_timing2/1000|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+densityplot(~offset_i|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+#
+# Classification#
+#
+# Logistic regression, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	if(table(result<0)[1] == 65){#
+		if(table(train$pref3)[2] > table(train$pref3)[1]){#
+			score = table(test$pref3)[2]#
+		}#
+		else{score = table(test$pref3)[1]}#
+		}#
+	else{#
+		score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]} 	#
+		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_u + (u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+Baseline:		0.57#
+TIB only:	0.661#
+TIP only:		0.697#
+TIS only:		0.573#
+TIS + TIP:	0.697#
+TIB + TIS:	0.667#
+TIP + TIB:	0.692#
+TIS + TIP:	0.697#
+TIB + TIP + TIS:	0.681#
+#
+In the text:#
+offset_l:			0.641#
+offset_u + TIP:	0.712#
+#
+#
+## LDA, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib_tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+print('PREF3')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+> print('PREF3')#
+[1] "PREF3"#
+> print(paste(c("TIB only", tib)))#
+[1] "TIB only"          "0.661401538461538"#
+> print(paste(c("TIP only", tip)))#
+[1] "TIP only"          "0.697226153846154"#
+> print(paste(c("TIS only", tis)))#
+[1] "TIS only"          "0.574235384615385"#
+> print(paste(c("TIB + TIP", tib_tip)))#
+[1] "TIB + TIP"         "0.697515384615385"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("TIB + TIS", tib_tis)))#
+[1] "TIB + TIS"         "0.665936923076923"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("full", full)))#
+[1] "full"              "0.676752307692308"#
+> print(paste(c("offset_u", u)))#
+[1] "offset_u"          "0.656981538461539"#
+#
+#
+#
+## LDA, pref4#
+#
+basket = c()#
+for(i in c(1:100)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]	#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+print('PREF4')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+#
+print(paste(c("u_tip", u_tip)))#
+print(paste(c("l", l)))#
+#
+#Leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)#
+#
+### pref3, leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)
+densityplot(~offset_i|pref3,d, layout=c(1,2))
+#
+#
+# import the thre tables#
+#
+d1 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15a.txt',quote = "", na.string=c('?','NA'))#
+d2 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15b.txt',quote = "", na.string=c('?','NA'))#
+d3 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15c.txt',quote = "", na.string=c('?','NA'))#
+#
+d = rbind(d1,d2)#
+d = rbind(d,d3)#
+d.raw = d#
+#
+rm(d1)#
+rm(d2)#
+rm(d3)#
+#
+## exclude deferred responses (responses to increments, etc.)#
+d = subset(d, pos1!='pur.inc' & pos1!= 'insert')#
+#
+## exclude third party actions#
+d = subset(d, act1!='"offer, third party"' & act1!='"proposal, third party"' & act1!='"request, third party"' & act1!='"suggestion/offer, third party"' & act1!='"offer/proposal, third party"' & act1 != '"invitation, third party"' & act1 != '"pre, third party"')#
+#
+d$act1 = as.factor(as.character(d$act1))#
+#
+## creates a variable encoding the number of turn design features in response#
+d$score = 0#
+d[d$has_well2=='y',]$score = d[d$has_well2=='y',]$score + 1#
+d[d$has_rep2=='y',]$score = d[d$has_rep2=='y',]$score + 1#
+d[d$has_hes2=='y',]$score = d[d$has_hes2=='y',]$score + 1#
+d[d$has_pause2=='y',]$score = d[d$has_pause2=='y',]$score + 1#
+d[d$has_breath2=='y',]$score = d[d$has_breath2=='y',]$score + 1#
+d[d$has_click2=='y',]$score = d[d$has_click2=='y',]$score + 1#
+#
+d$score2 = NA#
+d[d$score==0,]$score2 = '0'#
+d[d$score==1,]$score2 = '1'#
+d[d$score==2,]$score2 = '2'#
+d[d$score>2,]$score2 = '3+'#
+#
+## some manual corrections#
+d[d$name=='1a Ali & Sara 1_35.041',]$act2 = 'accept'#
+d[d$name=='1a Ali & Sara 1_35.041',]$pref = 'pref'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$act2 = 'accept'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$pref = 'pref'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1 = 'redo'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1b = 'sub'#
+d[d$name=='3b Ali & Boo 3_80.190',]$act2 = 'accept_qual'#
+#
+#
+#
+## these ones had pref = 'dis?' originally#
+d[d$pref=='dis?',]$pref = 'dis'#
+#
+# but this one has 'yes' in second, so we make it pref:#
+d[d$name=='Holt.SO.88.2.8_38.282',]$pref = 'pref'#
+#
+## New preference variables#
+#
+# pref2#
+# pref = unqualified pref#
+# ppref = pseudo preferred#
+d$pref2 = NA#
+d[d$act2b%in%c('accept_unqual','go ahead'),]$pref2 = 'pref'#
+d[d$act2b%in%c('accept_qual'),]$pref2 = 'ppref'#
+d[d$act2b%in%c('reject','reject_flat','pre-reject', 'block', 'equivocate'),]$pref2 = 'dis'#
+d[d$act2b%in%c('repair','insert', 'receipt'),]$pref2 = 'pdis'#
+d[is.na(d$pref2),]$pref2 = 'pdis'#
+#
+#pref3. Only two levels (pref and dis)#
+d$pref3 = 'pref'#
+d[d$pref2%in%c('dis','pdis'),]$pref3 = 'dis'#
+#
+#pref4. Collapses pdis and dis into dis. 3 levels: pref, ppref, dis. #
+d$pref4 = 'dis'#
+d[d$pref2=='pref',]$pref4 = 'pref'#
+d[d$pref2=='ppref',]$pref4 = 'ppref'#
+#
+## remove 6 outliers (see reasons in the earlier R file)#
+d = subset(d, offset_u > -0.5 & offset_u < 2)#
+#
+# d.no_overlap#
+d.no_overlap = subset(d, is.na(offset)==F)#
+#
+# d gapmean outlier out#
+d.gapmean = subset(d, gapmean<4000)#
+#
+d$tipb = (d$i_present==T | d$u_present==T | d$w_present==T)#
+#
+# only dispreferreds with no TIP or breath#
+f = subset(d, pref4=='dis' & i_present==F & u_present==F & w_present==F)#
+#
+dj = subset(d, is.na(jgap)==F)#
+#
+dj$jgap_timing = NA#
+dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap_timing = as.numeric(as.character(dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap))#
+#
+dj$jgap_cat = as.character(dj$jgap)#
+#
+dj[dj$jgap=='200' | dj$jgap=='300' | dj$jgap=='400' | dj$jgap=='500' |dj$jgap=='600' |dj$jgap=='700' | dj$jgap=='800' | dj$jgap=='1000' | dj$jgap=='1200' | dj$jgap=='1300' | dj$jgap=='1500',]$jgap_cat = 'gap'#
+dj$jgap_cat = as.factor(dj$jgap_cat)#
+#
+dj$jgap_timing2 = dj$jgap_timing#
+dj[dj$jgap_cat%in%c('nogap','latch'),]$jgap_timing2 = 0#
+dj[dj$jgap_cat=='micro',]$jgap_timing2 = 100#
+#
+#
+# remove outliers#
+dj2 = subset(dj, offset_i > 0.25 & offset_i< 1.3)#
+plot(dj2$offset_i , dj2$jgap_timing2/1000, ylim=c(-0.5,2), xlim=c(-0.5, 2), xlab='TIS (s)', ylab='GJ timing')#
+abline(0,1, lty=2)#
+abline(lm(jgap_timing2/1000~offset_i, dj2), lty=1, add=T)#
+#
+#
+#
+densityplot(~jgap_timing2/1000|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+densityplot(~offset_i|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+#
+# Classification#
+#
+# Logistic regression, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	if(table(result<0)[1] == 65){#
+		if(table(train$pref3)[2] > table(train$pref3)[1]){#
+			score = table(test$pref3)[2]#
+		}#
+		else{score = table(test$pref3)[1]}#
+		}#
+	else{#
+		score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]} 	#
+		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_u + (u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+Baseline:		0.57#
+TIB only:	0.661#
+TIP only:		0.697#
+TIS only:		0.573#
+TIS + TIP:	0.697#
+TIB + TIS:	0.667#
+TIP + TIB:	0.692#
+TIS + TIP:	0.697#
+TIB + TIP + TIS:	0.681#
+#
+In the text:#
+offset_l:			0.641#
+offset_u + TIP:	0.712#
+#
+#
+## LDA, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib_tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+print('PREF3')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+> print('PREF3')#
+[1] "PREF3"#
+> print(paste(c("TIB only", tib)))#
+[1] "TIB only"          "0.661401538461538"#
+> print(paste(c("TIP only", tip)))#
+[1] "TIP only"          "0.697226153846154"#
+> print(paste(c("TIS only", tis)))#
+[1] "TIS only"          "0.574235384615385"#
+> print(paste(c("TIB + TIP", tib_tip)))#
+[1] "TIB + TIP"         "0.697515384615385"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("TIB + TIS", tib_tis)))#
+[1] "TIB + TIS"         "0.665936923076923"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("full", full)))#
+[1] "full"              "0.676752307692308"#
+> print(paste(c("offset_u", u)))#
+[1] "offset_u"          "0.656981538461539"#
+#
+#
+#
+## LDA, pref4#
+#
+basket = c()#
+for(i in c(1:100)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]	#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+print('PREF4')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+#
+print(paste(c("u_tip", u_tip)))#
+print(paste(c("l", l)))#
+#
+#Leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)#
+#
+### pref3, leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)
+library(lattice)
+#
+#
+# import the thre tables#
+#
+d1 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15a.txt',quote = "", na.string=c('?','NA'))#
+d2 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15b.txt',quote = "", na.string=c('?','NA'))#
+d3 = read.delim('/Users/frator/Documents/Preference/Preference TextGrids /table15c.txt',quote = "", na.string=c('?','NA'))#
+#
+d = rbind(d1,d2)#
+d = rbind(d,d3)#
+d.raw = d#
+#
+rm(d1)#
+rm(d2)#
+rm(d3)#
+#
+## exclude deferred responses (responses to increments, etc.)#
+d = subset(d, pos1!='pur.inc' & pos1!= 'insert')#
+#
+## exclude third party actions#
+d = subset(d, act1!='"offer, third party"' & act1!='"proposal, third party"' & act1!='"request, third party"' & act1!='"suggestion/offer, third party"' & act1!='"offer/proposal, third party"' & act1 != '"invitation, third party"' & act1 != '"pre, third party"')#
+#
+d$act1 = as.factor(as.character(d$act1))#
+#
+## creates a variable encoding the number of turn design features in response#
+d$score = 0#
+d[d$has_well2=='y',]$score = d[d$has_well2=='y',]$score + 1#
+d[d$has_rep2=='y',]$score = d[d$has_rep2=='y',]$score + 1#
+d[d$has_hes2=='y',]$score = d[d$has_hes2=='y',]$score + 1#
+d[d$has_pause2=='y',]$score = d[d$has_pause2=='y',]$score + 1#
+d[d$has_breath2=='y',]$score = d[d$has_breath2=='y',]$score + 1#
+d[d$has_click2=='y',]$score = d[d$has_click2=='y',]$score + 1#
+#
+d$score2 = NA#
+d[d$score==0,]$score2 = '0'#
+d[d$score==1,]$score2 = '1'#
+d[d$score==2,]$score2 = '2'#
+d[d$score>2,]$score2 = '3+'#
+#
+## some manual corrections#
+d[d$name=='1a Ali & Sara 1_35.041',]$act2 = 'accept'#
+d[d$name=='1a Ali & Sara 1_35.041',]$pref = 'pref'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$act2 = 'accept'#
+d[d$name=='2b Ali & Noelle 2_176.815',]$pref = 'pref'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1 = 'redo'#
+d[d$name=='3b Ali & Boo 3_80.190',]$pos1b = 'sub'#
+d[d$name=='3b Ali & Boo 3_80.190',]$act2 = 'accept_qual'#
+#
+#
+#
+## these ones had pref = 'dis?' originally#
+d[d$pref=='dis?',]$pref = 'dis'#
+#
+# but this one has 'yes' in second, so we make it pref:#
+d[d$name=='Holt.SO.88.2.8_38.282',]$pref = 'pref'#
+#
+## New preference variables#
+#
+# pref2#
+# pref = unqualified pref#
+# ppref = pseudo preferred#
+d$pref2 = NA#
+d[d$act2b%in%c('accept_unqual','go ahead'),]$pref2 = 'pref'#
+d[d$act2b%in%c('accept_qual'),]$pref2 = 'ppref'#
+d[d$act2b%in%c('reject','reject_flat','pre-reject', 'block', 'equivocate'),]$pref2 = 'dis'#
+d[d$act2b%in%c('repair','insert', 'receipt'),]$pref2 = 'pdis'#
+d[is.na(d$pref2),]$pref2 = 'pdis'#
+#
+#pref3. Only two levels (pref and dis)#
+d$pref3 = 'pref'#
+d[d$pref2%in%c('dis','pdis'),]$pref3 = 'dis'#
+#
+#pref4. Collapses pdis and dis into dis. 3 levels: pref, ppref, dis. #
+d$pref4 = 'dis'#
+d[d$pref2=='pref',]$pref4 = 'pref'#
+d[d$pref2=='ppref',]$pref4 = 'ppref'#
+#
+## remove 6 outliers (see reasons in the earlier R file)#
+d = subset(d, offset_u > -0.5 & offset_u < 2)#
+#
+# d.no_overlap#
+d.no_overlap = subset(d, is.na(offset)==F)#
+#
+# d gapmean outlier out#
+d.gapmean = subset(d, gapmean<4000)#
+#
+d$tipb = (d$i_present==T | d$u_present==T | d$w_present==T)#
+#
+# only dispreferreds with no TIP or breath#
+f = subset(d, pref4=='dis' & i_present==F & u_present==F & w_present==F)#
+#
+dj = subset(d, is.na(jgap)==F)#
+#
+dj$jgap_timing = NA#
+dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap_timing = as.numeric(as.character(dj[dj$jgap!='latch' & dj$jgap!='micro' & dj$jgap!='nogap' & dj$jgap!='overlap' & is.na(dj$jgap)==F,]$jgap))#
+#
+dj$jgap_cat = as.character(dj$jgap)#
+#
+dj[dj$jgap=='200' | dj$jgap=='300' | dj$jgap=='400' | dj$jgap=='500' |dj$jgap=='600' |dj$jgap=='700' | dj$jgap=='800' | dj$jgap=='1000' | dj$jgap=='1200' | dj$jgap=='1300' | dj$jgap=='1500',]$jgap_cat = 'gap'#
+dj$jgap_cat = as.factor(dj$jgap_cat)#
+#
+dj$jgap_timing2 = dj$jgap_timing#
+dj[dj$jgap_cat%in%c('nogap','latch'),]$jgap_timing2 = 0#
+dj[dj$jgap_cat=='micro',]$jgap_timing2 = 100#
+#
+#
+# remove outliers#
+dj2 = subset(dj, offset_i > 0.25 & offset_i< 1.3)#
+plot(dj2$offset_i , dj2$jgap_timing2/1000, ylim=c(-0.5,2), xlim=c(-0.5, 2), xlab='TIS (s)', ylab='GJ timing')#
+abline(0,1, lty=2)#
+abline(lm(jgap_timing2/1000~offset_i, dj2), lty=1, add=T)#
+#
+#
+#
+densityplot(~jgap_timing2/1000|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+densityplot(~offset_i|pref3,dj2[is.na(dj2$jgap)==F,], layout=c(1,2), xlim=c(-1, 2))#
+#
+# Classification#
+#
+# Logistic regression, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	if(table(result<0)[1] == 65){#
+		if(table(train$pref3)[2] > table(train$pref3)[1]){#
+			score = table(test$pref3)[2]#
+		}#
+		else{score = table(test$pref3)[1]}#
+		}#
+	else{#
+		score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]} 	#
+		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~i_present+offset_i,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset,d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = glm(as.factor(pref3)~offset_u + (u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result>0)[1,1] + table(test$pref3, result>0)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+Baseline:		0.57#
+TIB only:	0.661#
+TIP only:		0.697#
+TIS only:		0.573#
+TIS + TIP:	0.697#
+TIB + TIS:	0.667#
+TIP + TIB:	0.692#
+TIS + TIP:	0.697#
+TIB + TIP + TIS:	0.681#
+#
+In the text:#
+offset_l:			0.641#
+offset_u + TIP:	0.712#
+#
+#
+## LDA, pref3#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]		#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+l_tib_tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref3)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref3, result$class)[1,1] + table(test$pref3, result$class)[2,2]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+print('PREF3')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+print(paste(c("offset_u", u)))#
+#
+> print('PREF3')#
+[1] "PREF3"#
+> print(paste(c("TIB only", tib)))#
+[1] "TIB only"          "0.661401538461538"#
+> print(paste(c("TIP only", tip)))#
+[1] "TIP only"          "0.697226153846154"#
+> print(paste(c("TIS only", tis)))#
+[1] "TIS only"          "0.574235384615385"#
+> print(paste(c("TIB + TIP", tib_tip)))#
+[1] "TIB + TIP"         "0.697515384615385"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("TIB + TIS", tib_tis)))#
+[1] "TIB + TIS"         "0.665936923076923"#
+> print(paste(c("TIS + TIP", tis_tip)))#
+[1] "TIS + TIP"         "0.697138461538462"#
+> print(paste(c("full", full)))#
+[1] "full"              "0.676752307692308"#
+> print(paste(c("offset_u", u)))#
+[1] "offset_u"          "0.656981538461539"#
+#
+#
+#
+## LDA, pref4#
+#
+basket = c()#
+for(i in c(1:100)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d,family=binomial)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tip = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]	#
+	basket = append(basket, score/65)}#
+tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~i_present+offset_i,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tib_tis = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+tis_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_i+i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+full = mean(basket)#
+#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+l_tip_tib = mean(basket)#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + ,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + (u_present|w_present) + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tip_tib = mean(basket)#
+#
+#
+basket = c()#
+for(i in c(1:10000)){#
+	s = sample(c(1:195),130)#
+	train = d[s,]#
+	test = d[-s,]#
+	model = lda(as.factor(pref4)~offset_u + i_present,d)#
+	result = predict(model, test)#
+	score = table(test$pref4, result$class)[1,1] + table(test$pref4, result$class)[2,2] + table(test$pref4, result$class)[3,3]#
+	basket = append(basket, score/65)}#
+u_tib = mean(basket)#
+#
+print('PREF4')#
+print(paste(c("TIB only", tib)))#
+print(paste(c("TIP only", tip)))#
+print(paste(c("TIS only", tis)))#
+print(paste(c("TIB + TIP", tib_tip)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("TIB + TIS", tib_tis)))#
+print(paste(c("TIS + TIP", tis_tip)))#
+print(paste(c("full", full)))#
+#
+print(paste(c("u_tip", u_tip)))#
+print(paste(c("l", l)))#
+#
+#Leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref4)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref4)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref4){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)#
+#
+### pref3, leave-one-out approach#
+#
+## offset_i#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tip = mean(score/195)#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis = mean(score/195)#
+#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~i_present+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tib_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_i+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+tis_tip_tib = mean(score/195)#
+#
+#
+## offset_l#
+#
+dl = subset(d, is.na(offset)==F)#
+#
+score = 0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present),dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tib = mean(score/193)#
+#
+score=0#
+for(i in c(1:193)){#
+	train = dl[-i,]#
+	test = dl[i,]#
+	model = lda(as.factor(pref3)~offset+(u_present|w_present)+i_present,dl)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+l_tip_tib = mean(score/193)#
+#
+rm(dl)#
+#
+#
+### offset_u#
+#
+score = 0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present),d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tib = mean(score/195)#
+#
+score=0#
+for(i in c(1:195)){#
+	train = d[-i,]#
+	test = d[i,]#
+	model = lda(as.factor(pref3)~offset_u+(u_present|w_present)+i_present,d)#
+	result = predict(model, test)#
+	if(result$class == test$pref3){#
+		score = score + 1#
+		}#
+	}#
+u_tip_tib = mean(score/195)
+library(tuneR)
+library(seewave)
+a = readWave("/Volumes/Lc-etc/raw_data/ETC/02/temp/120914130511.pjt/2.wav")
+b = extractWave(a, 320,330, xunit="time")
+b
+c = as.numeric(b)
+env(b)
+quartz()
+oscillo(b)
+str(b)
+b@left
+c = b@left#
+c = sqrt(c^2)
+c
+plot(c)
+c = ffilter(c, to=10)
+c = ffilter(c, f=44100, to=10)
+c = c - mean(c)
+plot(c)
+library(tuneR)#
+a = readWave("/Volumes/Lc-etc/raw_data/ETC/02/temp/120914130511.pjt/2.wav")#
+b = extractWave(a, 320,330, xunit="time")#
+c = b@left#
+c = sqrt(c^2)#
+c = ffilter(c, f=44100, from=0, to=10)#
+c = c - mean(c)
+plot(c)
+c = env(b)
+str(c)
+c = env(f=44100, b)
+c = hilbert(f=44100, b)
+c
+plot(c)
+str(c)
+oscillo(c, henv=T)
+oscillo(b, henv=T)
+c = b@left#
+c = sqrt(c^2)#
+c = ffilter(c, f=44100, from=0, to=10)
+str(c)
+plot(c)
+c = b@left#
+c = sqrt(c^2)#
+c = ffilter(c, f=22050, from=0, to=10)
+plot(c)
+c = b@left#
+c = sqrt(c^2)#
+c = Wave(left ,c)
+c = b@left#
+c = sqrt(c^2)#
+c = Wave(left=c)
+c = b@left#
+c = sqrt(c^2)#
+c = Wave(left=c, samp.rate=44100, but=16)
+c = b@left#
+c = sqrt(c^2)#
+c = Wave(left=c, samp.rate=44100, bit=16)
+c
+plot(c)
+ffilter(c)
+ffilter(c, to=10)
+plot(ffilter(c, to=10))
+b
+c = b@left
+plot(c)
+c = sqrt(c^2)
+plot(c)
+c = ffilter(c, f=44100, from=0, to=10)
+c = c - mean(c)
+plot(c)
+env(b)
+env(b, ksmooth=T)
+env(b, msmooth=c(10,50))
+env(b, ksmooth=c("daniell",10))
+env(b, ksmooth=kernel("daniell",10))
+env(b)
+ffilter(env(b), to=10)
+ffilter(env(b), to=10, f=44100)
+plot(ffilter(env(b), to=10, f=44100))
+a = readWave('/Users/frator/Documents/CORPORA/ETC/120914130511.pjt/2.wav')#
+b = extractWave(a, 320,330)
+b
+a
+a = readWave('/Users/frator/Documents/CORPORA/ETC/120914130511.pjt/2.wav')#
+b = extractWave(a, 320,330, xunit="time")
+b
+a = readWave('/Users/frator/Documents/CORPORA/ETC/120914130511.pjt/2.wav')#
+b = extractWave(a, 320,325, xunit="time")
+oscillo(b)
+c = b$left
+c = b@left
+c
+plot(c)
+c = sqrt(c^2)
+plot(c)
+ffilter(c, from=0, to=10)
+ffilter(c, from=0, to=10, f=44100)
+plot(ffilter(c, from=0, to=10, f=44100))
+env(b)
+?ffilter
+plot(ffilter(c, from=0, to=10, f=44100, output="Wave"))
+plot(ffilter(c, from=0, to=10, f=44100, output="ts"))
+plot(ffilter(c, from=0, to=10, f=44100, output="Sample"))
+plot(ffilter(c, from=0, to=10, f=44100, output="AudioSample"))
+c
+plot(c)
+a<-noisew(f=8000,d=1)
+b<-ffilter(a,f=8000,to=1500)
+spectro(b,f=8000,wl=512)
+spectro(ffilter(c, from=0, to=10, f=44100, output="AudioSample"))
+spectro(ffilter(c, from=0, to=10, f=44100))
+spectro(ffilter(c, from=0, to=10, f=44100), f=44100)
+plot(ffilter(c, from=0, to=10, f=44100), f=44100)
+oscillo(ffilter(c, from=0, to=10, f=44100), f=44100)
+oscillo(ffilter(c, from=0, to=10, f=44100, output="Wave"), f=44100)
+oscillo(ffilter(c, from=0, to=1, f=44100), f=44100)
+a = readWave('/Users/frator/Documents/CORPORA/ETC/120914130511.pjt/2.wav')
+b = extractWave(a, 320,330, xunit="time")
+plot(b)
+c = b$left
+c = b@left
+c
+c = sqrt(c^2)
+plot(c)
+ffilter(c, f=44100, from=0, to=10)
+sendpraat = function(command, args=''){#
+	header = "sendpraat Praat"#
+		#
+	if(args != ''){#
+		command = paste('"', command, sep='')#
+		args = paste(args, '"', sep='')#
+		system(paste(header, command, args))	#
+		}#
+	if(args==''){#
+		system(paste(header, command))#
+		}#
+	}
+sendpraat('printline', 'Hello')
+ls()
+str(d)
+ls()
+d = read.delim('/Users/frator/Documents/Questions/segmentDurationsAll.txt')
+str(d)
+table(d$segment)
+tapply(d$duration, mean, d$segment)
+tapply(d$duration, d$segment, mean)
+100 * 120 / 100
+100 * (1.2)
+120 / 100
+24 * 60
+d = read.delim('/Users/frator/Documents/Int2012/Assoc/apellidos.txt')
+ls()
+str(d)
+d$numbrt
+d$number
+d = read.delim('/Users/frator/Documents/Int2012/Assoc/apellidos.txt')
+d$number
+str(d)
+subset(d, number>200000)
+subset(d, number>200000)$name
+subset(d, number>q00000)$name
+subset(d, number>100000)$name
+subset(d, number>50000)$name
+subset(d, number>5000)$name
+d = read.delim('/Users/frator/Documents/Repairs/pitch_data/Sp_16_729220_734060.pitch')
+str(d)
+d$time
+d$st
+plot(d$time, d$st)
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=(-10,10), xlim=c(-0.25,1.25),col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	d$norm_st = d$st - mean(d$st)	#
+	lines(d$time, d$norm_st)#
+	}
+d
+lines(d$time, d$st)
+lines(d$time, d$st)
+plot(0,0, ylim=(-10,10), xlim=c(-0.25,1.25),col='white')
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	d$norm_st = d$st - mean(d$st)	#
+	lines(d$time, d$norm_st)#
+	}
+file
+file[0:2]
+grep("Sp", file)
+grep("Ch", file)
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(grep("Sp",file)){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(grep("Sp",file)==1){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+grep("Sp", file)\
+grep("Sp", file)
+file
+grep("Ch", file)
+grep("Ch", file)==F
+grep("Ch", file)==T
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(grep("Sp",file)==T){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(grep("Sp",file)!=F){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+grep("Ch", file)
+grep("Sp", file)
+length(grep("Sp", file))
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=0.7), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=0.9), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1), lwd=1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1.5), lwd=1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1.5), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s), lwd=1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=0.25), lwd=1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		s = spline(d$time, d$norm_st)#
+		lines(smooth.spline(s, spar=1), lwd=1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.5)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.5)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.5)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.5)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+quartz(w=5,h=5)#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=5)#
+par(mfrow=c(1,2))#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white') #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=5)#
+par(mfrow=c(1,2))#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white', xlab="Norm. Time", ylab="") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=5)#
+par(mfrow=c(1,2))#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.25,1.25), col='white', xlab="Norm. Time", ylab="", main="Cha'palaa") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=5)#
+par(mfrow=c(1,2))#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="", main="Cha'palaa") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=4)#
+par(mfrow=c(1,2))#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}#
+	#
+plot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="", main="Cha'palaa") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Ch",file))>0){#
+		d$norm_st = d$st - mean(d$st)#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')
+str(d)
+plot(d$f1, f$2)
+plot(d$f1, d$f2)
+plot(d$f2, d$f1)
+plot(d$f2, d$f1*-1)
+plot(d$f2*-1, d$f1*-1)
+plot(rev(d$f2), rev(d$f1))
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300))
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300), pch=as.character(d$language))
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=log(c(2300,1000)), ylim=log(c(1000,300)), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(5,5)#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(w=5,h=5)#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(w=5.5,h=5.5)#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2300,1000), ylim=c(1000,300), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(w=5.5,h=5.5)#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2600,700), ylim=c(1000,200), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(w=5.5,h=5.5)#
+#
+plot(d$f2, d$f1, xlab="F1 (Hz)", ylab="F2 (Hz)", xlim=c(2400,700), ylim=c(1000,200), pch=as.character(d$language))
+d = read.delim('/Users/frator/Documents/Repairs/formantData.txt')#
+#
+quartz(w=5.5,h=5.5)#
+#
+plot(d$f2, d$f1, xlab="F2 (Hz)", ylab="F1 (Hz)", xlim=c(2400,700), ylim=c(1000,200), pch=as.character(d$language))
+library(ggplot)
+library(ggplot)
+library(ggplot2)
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=4)#
+par(mfrow=c(1,2))#
+qplot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		lines(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=4)#
+par(mfrow=c(1,2))#
+qplot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish") #
+for(file in fileList){#
+	d = read.delim(file)#
+	if(length(grep("Sp",file))>0){#
+		d$norm_st = d$st - mean(d$st)	#
+		geom_line(d$time, d$norm_st, lwd=1.1)#
+		}#
+	}
+setwd('/Users/frator/Documents/Repairs/pitch_data')#
+#
+fileList <- list.files(pattern=".pitch")#
+numberOfFiles <- length(fileList)#
+#
+quartz(w=8,h=4)#
+par(mfrow=c(1,2))#
+qplot(0,0, ylim=c(-10,10), xlim=c(-0.1,1.1), col='white', xlab="Norm. Time", ylab="Centered pitch (semitones)", main="Spanish")
+qplot(0,0)
+qplot(1,1)
+qplot(d$time,d$st)
+d$st
+qplot(d$time,d$st)
+d$time
+qplot(d$time,d$st)
+d$st
+qplot(c(1,2,3),c(1,2,3))
+qplot(x=c(1,2,3),y=c(1,2,3))
