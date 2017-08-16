@@ -269,7 +269,7 @@ ggplot(a.f,aes(language,asp,size=prop)) +
   xlab("") +
   scale_y_continuous(minor_breaks=NULL,breaks=c(0:3), labels=c("Ø","","","h")) +
   theme(axis.text.x = element_text(angle=45, hjust=1))
-ggsave(file=paste("out/Onset aspiration - n",cases,".png", sep=""), width=9,height=6)
+#ggsave(file=paste("out/Onset aspiration - n",cases,".png", sep=""), width=9,height=6)
 
 
 # Onset: glottis action ---------------------------------------------------
@@ -294,5 +294,5 @@ ggplot(g.f,aes(language,glot,size=prop)) +
   theme(axis.text.y = element_text(family="Times New Roman")) +
   scale_y_continuous(minor_breaks=NULL,breaks=c(0:3), labels=c("Ø", "","", "ʔ")) +
   theme(axis.text.x = element_text(angle=45, hjust=1))
-ggsave(file=paste("out/Onset glottal - n",cases,".png", sep=""), width=9,height=6)
+#ggsave(file=paste("out/Onset glottal - n",cases,".png", sep=""), width=9,height=6)
 
